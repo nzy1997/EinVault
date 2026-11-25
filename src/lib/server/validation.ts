@@ -24,6 +24,7 @@ import {
 	DAILY_EVENT_TYPES,
 	WEIGHT_UNITS,
 	SPECIES,
+	isMealAmount,
 	type DailyEventType,
 	type WeightUnit,
 	type Species
@@ -33,6 +34,14 @@ export type { DailyEventType, WeightUnit, Species };
 
 export function parseDailyEventType(value: string): DailyEventType | null {
 	return parseEnum(value, DAILY_EVENT_TYPES);
+}
+
+// Missing or blank means unmeasured. An explicit 0 records that no food was eaten.
+export function parseMealAmountGrams(value: unknown): number | null | undefined {
+	if (value === null || (typeof value === 'string' && !value.trim())) return null;
+	if (typeof value !== 'string') return undefined;
+	const amount = Number(value);
+	return isMealAmount(amount) ? amount : undefined;
 }
 
 // Species

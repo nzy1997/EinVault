@@ -60,7 +60,9 @@
 	} from '#lib/dayItems.js';
 	import { SvelteDate } from 'svelte/reactivity';
 	import { localDatetimes } from '#lib/actions/localDatetimes.js';
+	import MealAmountField from '#lib/components/log/MealAmountField.svelte';
 	import { t, getLocale } from '#lib/i18n/index.js';
+	import { formatMealGrams } from '#lib/i18n/voice.js';
 	import {
 		moodOptions,
 		activityDisplayIcon,
@@ -766,6 +768,9 @@
 								</div>
 							</fieldset>
 						{/if}
+						{#if selectedType === 'meal'}
+							<MealAmountField multiple={selectedAdditionalIds.length > 0} />
+						{/if}
 						<div class="space-y-1.5">
 							<label for="act-loggedAt" class="text-sm font-medium text-foreground"
 								>{t(locale, 'page.journal.day.activityTime')}</label
@@ -875,6 +880,9 @@
 											? subtypesKeepingSaved(species, editActivityType, event.subtypes ?? [])
 											: undefined}
 									/>
+									{#if editActivityType === 'meal'}
+										<MealAmountField value={event.amountGrams ?? undefined} />
+									{/if}
 									<div class="grid grid-cols-2 gap-4">
 										<div class="space-y-1.5">
 											<label
@@ -959,6 +967,11 @@
 											{#if event.durationMinutes}
 												<span class="text-xs text-muted-foreground"
 													>{event.durationMinutes} min</span
+												>
+											{/if}
+											{#if event.amountGrams !== null}
+												<span class="text-xs text-muted-foreground"
+													>{formatMealGrams(locale, event.amountGrams)}</span
 												>
 											{/if}
 										</div>

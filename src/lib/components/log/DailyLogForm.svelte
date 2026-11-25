@@ -17,6 +17,7 @@
 		subtypesForAny
 	} from '#lib/species.js';
 	import ActivityTypePills from '#lib/components/log/ActivityTypePills.svelte';
+	import MealAmountField from '#lib/components/log/MealAmountField.svelte';
 	import SubtypePills from '#lib/components/log/SubtypePills.svelte';
 
 	interface CompanionOption {
@@ -64,6 +65,7 @@
 				: typeList[0]
 	);
 	let duration = $state('');
+	let amountGrams = $state<number>();
 	let notes = $state('');
 	let subtypes = $state<string[]>([]);
 
@@ -144,6 +146,7 @@
 			await update({ reset: false });
 			if (result.type === 'success') {
 				duration = '';
+				amountGrams = undefined;
 				notes = '';
 				subtypes = [];
 				selectedAdditionalIds = [];
@@ -258,6 +261,15 @@
 				/>
 			</div>
 		</div>
+	{/if}
+
+	{#if selectedType === 'meal'}
+		<MealAmountField
+			bind:value={amountGrams}
+			multiple={primaryCompanion
+				? selectedAdditionalIds.length > 0
+				: selectedCompanionIds.length > 1}
+		/>
 	{/if}
 
 	<div class="space-y-1.5">

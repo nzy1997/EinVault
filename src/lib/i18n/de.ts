@@ -1071,6 +1071,8 @@ const messages: Record<keyof Messages, string> = {
 	'page.log.activityLabel': 'Aktivität',
 	'page.log.subtypeLabel': 'Welche Art?',
 	'page.log.durationLabel': 'Dauer (Minuten)',
+	'page.log.mealAmount': 'Gefressene Menge (g)',
+	'page.log.mealAmountPerPet': 'Gefressene Menge pro Tier (g)',
 	'page.log.whenLabel': 'Wann',
 	'page.log.notesLabel': 'Notizen',
 	'page.log.notesOptional': '(optional)',
@@ -1253,6 +1255,7 @@ const messages: Record<keyof Messages, string> = {
 	'page.incident.filesFailed': 'Gespeichert, aber diese Dateien wurden nicht hochgeladen:',
 	'page.incident.continue': 'Weiter',
 	'error.resolvedBeforeStart': 'Das Abschlussdatum darf nicht vor dem Beginn liegen.',
+	'error.invalidMealAmount': 'Gib eine gültige Menge in Gramm ein, mindestens 0.',
 	'error.invalidDuration': 'Die Dauer muss eine ganze Zahl von Minuten sein, höchstens 480.',
 	'error.invalidLoggedAt':
 		'loggedAt muss ein gültiges ISO-8601-Datum/Uhrzeit im erlaubten Bereich sein.',

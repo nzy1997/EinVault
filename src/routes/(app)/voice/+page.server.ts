@@ -6,9 +6,8 @@ import { db, schema } from '#lib/server/db/index.js';
 import { t } from '#lib/i18n/index.js';
 import { voiceCopy } from '#lib/i18n/voice.js';
 import { MAX_NOTE_LEN } from '#lib/textLimits.js';
-import { parseLoggedAt } from '#lib/server/validation.js';
+import { parseLoggedAt, parseMealAmountGrams } from '#lib/server/validation.js';
 import {
-	isMealAmount,
 	readVoiceAudioType,
 	VOICE_ACTIVITY_TYPES,
 	VOICE_LITTER_SUBTYPES,
@@ -108,14 +107,13 @@ export const actions: Actions = {
 		const type = String(form.get('type') ?? '') as VoiceActivity;
 		const subtype = String(form.get('subtype') ?? '') as VoiceLitterSubtype;
 		const loggedAt = parseLoggedAt(form.get('loggedAt'));
-		const rawAmount = String(form.get('amountGrams') ?? '').trim();
-		const amountGrams = type === 'meal' && rawAmount ? Number(rawAmount) : null;
+		const amountGrams = type === 'meal' ? parseMealAmountGrams(form.get('amountGrams')) : null;
 		const notes = String(form.get('notes') ?? '').trim();
 		if (
 			!VOICE_ACTIVITY_TYPES.includes(type) ||
 			!loggedAt ||
 			loggedAt.getTime() > Date.now() + 300_000 ||
-			(amountGrams !== null && !isMealAmount(amountGrams)) ||
+			amountGrams === undefined ||
 			(type === 'litter' && subtype && !VOICE_LITTER_SUBTYPES.includes(subtype)) ||
 			notes.length > MAX_NOTE_LEN
 		)

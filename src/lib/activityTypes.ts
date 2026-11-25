@@ -14,6 +14,10 @@ export const DAILY_EVENT_TYPES = [
 ] as const;
 export type DailyEventType = (typeof DAILY_EVENT_TYPES)[number];
 
+export function isMealAmount(value: number): boolean {
+	return Number.isFinite(value) && value >= 0 && value <= Number.MAX_SAFE_INTEGER;
+}
+
 export const WEIGHT_UNITS = ['kg', 'lbs', 'g', 'oz'] as const;
 export type WeightUnit = (typeof WEIGHT_UNITS)[number];
 

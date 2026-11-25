@@ -1,4 +1,5 @@
-import { isMealAmount, type VoiceDraft, type VoiceLitterSubtype } from '#lib/voice.js';
+import { isMealAmount } from '#lib/activityTypes.js';
+import type { VoiceDraft, VoiceLitterSubtype } from '#lib/voice.js';
 
 const DIGITS = '零一二三四五六七八九';
 const NUMERAL = '[0-9零〇一二两三四五六七八九十百千]+';
@@ -127,7 +128,7 @@ export function parseVoiceTranscript(transcript: string, receivedAt: Date): Voic
 			? 'activity'
 			: !loggedAt
 				? 'time'
-				: type === 'meal' && !amountGrams
+				: type === 'meal' && amountGrams === null
 					? 'amount'
 					: null
 	};

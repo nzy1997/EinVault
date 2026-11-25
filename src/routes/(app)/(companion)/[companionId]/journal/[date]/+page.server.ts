@@ -10,6 +10,7 @@ import {
 	isValidDate,
 	parseIdArray,
 	parseDurationMinutes,
+	parseMealAmountGrams,
 	parseLoggedAt,
 	exceedsLen
 } from '#lib/server/validation.js';
@@ -163,6 +164,9 @@ export const actions: Actions = {
 		const loggedAt = parseLoggedAt(data.get('loggedAt')) ?? new Date();
 
 		if (!type) return fail(400, { error: t(locals.locale, 'error.eventTypeRequired') });
+		const amountGrams = type === 'meal' ? parseMealAmountGrams(data.get('amountGrams')) : null;
+		if (amountGrams === undefined)
+			return fail(400, { error: t(locals.locale, 'error.invalidMealAmount') });
 
 		// The primary companion always gets a row, even if archived: this page
 		// backfills entries for a companion's own journal, which stays reachable
@@ -198,6 +202,7 @@ export const actions: Actions = {
 			type,
 			notes,
 			durationMinutes,
+			amountGrams,
 			loggedAt,
 			subtypes: checked.subtypesById.get(cid) ?? null,
 			loggedBy: locals.user!.id,
@@ -226,6 +231,10 @@ export const actions: Actions = {
 
 		if (!id) return fail(400, { error: t(locals.locale, 'error.missingId') });
 		if (!type) return fail(400, { error: t(locals.locale, 'error.eventTypeRequired') });
+		const hasAmount = data.has('amountGrams');
+		const amountGrams = type === 'meal' ? parseMealAmountGrams(data.get('amountGrams')) : null;
+		if (amountGrams === undefined)
+			return fail(400, { error: t(locals.locale, 'error.invalidMealAmount') });
 
 		const resolved = await resolveActivityUpdate(companionId, id, type, data.getAll('subtypes'));
 		if (!resolved.ok)
@@ -235,7 +244,15 @@ export const actions: Actions = {
 
 		await db
 			.update(schema.dailyEvents)
-			.set({ type, notes, durationMinutes, loggedAt, subtypes: resolved.subtypes })
+			.set({
+				type,
+				notes,
+				durationMinutes,
+				loggedAt,
+				subtypes: resolved.subtypes,
+				// Older clients may update the meal without sending the new field.
+				...(hasAmount || type !== 'meal' ? { amountGrams } : {})
+			})
 			.where(eq(schema.dailyEvents.id, id));
 
 		return { updateActivitySuccess: true };

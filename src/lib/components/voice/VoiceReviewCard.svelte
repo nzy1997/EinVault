@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { localDatetimes } from '#lib/actions/localDatetimes.js';
 	import LocalTime from '#lib/components/LocalTime.svelte';
+	import MealAmountField from '#lib/components/log/MealAmountField.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
 	import { Select } from '#lib/components/ui/select/index.js';
@@ -107,16 +108,7 @@
 					/>
 				</label>
 				{#if type === 'meal'}
-					<label class="grid min-w-0 gap-1.5 text-sm">
-						{copy.amount} (g)
-						<Input
-							name="amountGrams"
-							type="number"
-							min="0.001"
-							step="any"
-							value={item.draft?.amountGrams ?? undefined}
-						/>
-					</label>
+					<MealAmountField value={item.draft?.amountGrams ?? undefined} />
 				{:else if type === 'litter'}
 					<label class="grid min-w-0 gap-1.5 text-sm">
 						{copy.subtype}

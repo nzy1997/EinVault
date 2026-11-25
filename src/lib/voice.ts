@@ -34,7 +34,3 @@ export interface VoiceDraft {
 	subtype: VoiceLitterSubtype | null;
 	issue: VoiceIssue | null;
 }
-
-export function isMealAmount(value: number): boolean {
-	return Number.isFinite(value) && value > 0 && value <= Number.MAX_SAFE_INTEGER;
-}

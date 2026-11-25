@@ -9,6 +9,7 @@ import { reminderLogEventUrl } from '#lib/health.js';
 import {
 	parseDailyEventType,
 	parseDurationMinutes,
+	parseMealAmountGrams,
 	parseLoggedAt,
 	parseIdArray,
 	exceedsLen
@@ -180,6 +181,9 @@ export const actions: Actions = {
 		const subtypes = data.getAll('subtypes').map(String);
 
 		if (!type) return fail(400, { error: t(locals.locale, 'error.typeRequired') });
+		const amountGrams = type === 'meal' ? parseMealAmountGrams(data.get('amountGrams')) : null;
+		if (amountGrams === undefined)
+			return fail(400, { error: t(locals.locale, 'error.invalidMealAmount') });
 
 		const companionIds = parseIdArray(data.getAll('companionIds'));
 		if (companionIds.length === 0)
@@ -188,7 +192,7 @@ export const actions: Actions = {
 		const result = await logDailyEvent(
 			{ id: locals.user.id, role: locals.user.role },
 			companionIds,
-			{ type, notes, durationMinutes, loggedAt, subtypes }
+			{ type, notes, durationMinutes, amountGrams, loggedAt, subtypes }
 		);
 		if (!result.ok) return failCareError(result.code, locals.locale, 'error');
 

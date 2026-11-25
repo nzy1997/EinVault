@@ -1069,6 +1069,8 @@ const messages: Record<keyof Messages, string> = {
 	'page.log.activityLabel': 'Activité',
 	'page.log.subtypeLabel': 'Quel type ?',
 	'page.log.durationLabel': 'Durée (minutes)',
+	'page.log.mealAmount': 'Quantité mangée (g)',
+	'page.log.mealAmountPerPet': 'Quantité mangée par animal (g)',
 	'page.log.whenLabel': 'Quand',
 	'page.log.notesLabel': 'Notes',
 	'page.log.notesOptional': '(facultatif)',
@@ -1250,6 +1252,7 @@ const messages: Record<keyof Messages, string> = {
 	'page.incident.filesFailed': "Enregistré, mais ces fichiers n'ont pas été envoyés :",
 	'page.incident.continue': 'Continuer',
 	'error.resolvedBeforeStart': 'La date de résolution ne peut pas précéder le début.',
+	'error.invalidMealAmount': 'Saisissez une quantité valide en grammes, égale ou supérieure à 0.',
 	'error.invalidDuration': 'La durée doit être un nombre entier de minutes, au maximum 480.',
 	'error.invalidLoggedAt':
 		'loggedAt doit être une date-heure ISO 8601 valide dans la plage autorisée.',

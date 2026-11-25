@@ -106,7 +106,7 @@ export const LoggedEvent = z
 		durationMinutes: z.number().int().nullable(),
 		amountGrams: z
 			.number()
-			.positive()
+			.nonnegative()
 			.nullable()
 			.openapi({ description: 'Amount eaten, in grams, when recorded for a meal.' }),
 		subtypes: z.array(z.string()).nullable(),

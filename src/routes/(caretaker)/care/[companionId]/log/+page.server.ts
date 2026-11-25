@@ -6,6 +6,7 @@ import { eq, and, gte } from 'drizzle-orm';
 import {
 	parseDailyEventType,
 	parseDurationMinutes,
+	parseMealAmountGrams,
 	parseLoggedAt,
 	parseIdArray,
 	exceedsLen
@@ -71,6 +72,9 @@ export const actions: Actions = {
 		const subtypes = data.getAll('subtypes').map(String);
 
 		if (!type) return fail(400, { error: t(locals.locale, 'error.typeRequired') });
+		const amountGrams = type === 'meal' ? parseMealAmountGrams(data.get('amountGrams')) : null;
+		if (amountGrams === undefined)
+			return fail(400, { error: t(locals.locale, 'error.invalidMealAmount') });
 
 		// "Also log for": unassigned/archived extras are dropped by logDailyEvent.
 		const additionalIds = parseIdArray(data.getAll('additionalCompanionIds')).filter(
@@ -80,7 +84,7 @@ export const actions: Actions = {
 		const result = await logDailyEvent(
 			{ id: locals.user.id, role: locals.user.role },
 			[params.companionId, ...additionalIds],
-			{ type, notes, durationMinutes, loggedAt, subtypes }
+			{ type, notes, durationMinutes, amountGrams, loggedAt, subtypes }
 		);
 		if (!result.ok) return failCareError(result.code, locals.locale, 'error');
 
