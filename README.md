@@ -59,6 +59,7 @@ Want a look before you self-host? There's a read-only demo at **[demo.einvault.a
 - **Incidents:** track something that goes wrong, like a symptom or an injury, until it is resolved, with severity, dated updates with photos and videos, and links to vet visits; caretakers can log them on shift and owners get an alert
 - **Activity logging:** walks, meals, bathroom trips, litter box visits, treats, play sessions, and grooming, with the choices matched to each companion's species (dog, cat, or other)
 - **Quick logs:** personal one-tap buttons for repetitive events, reorderable and shareable with other users
+- **Voice logs:** record a short clip on the cat dashboard, transcribe it on the host, and review uncertain results with the original audio. Clear Mandarin meal and litter-box entries can be saved automatically.
 - **Bearer-token API:** log activities and journal entries, manage notes, record health and weight, manage reminders, list medications and log doses, and read companion, shift, and roster data headlessly from smart buttons, scripts, and devices
 - **Reminders:** recurring and one-time reminders for medications, vaccinations, grooming, and more
 - **Search:** full-text search across journals, notes, health, activity, reminders, medications, supplies, documents, and media, with `@companion`, `#type`, and date-range filters (members and admins)
@@ -353,6 +354,23 @@ sudo npx playwright install-deps chromium   # system libraries, Debian/Ubuntu
 CI runs lint, type checks, unit tests, and the e2e suite (sharded four ways) on every PR.
 
 ---
+
+## Local voice logs
+
+Open **Voice log** from a cat's dashboard. Record on the page or upload an audio file up to 30 seconds and 4 MB. The app submits audio to the EinVault server. The server runs FFmpeg and [whisper.cpp](https://github.com/ggml-org/whisper.cpp) locally, using a multilingual Whisper model and Mandarin transcription.
+
+When running EinVault directly on the host with `node serve.js`, set these environment variables for the app process:
+
+```dotenv
+VOICE_WHISPER_BIN=/absolute/path/to/whisper-cli
+VOICE_WHISPER_MODEL=/absolute/path/to/ggml-small.bin
+VOICE_FFMPEG_BIN=/absolute/path/to/ffmpeg
+TZ=Asia/Shanghai
+```
+
+Set `TZ` to the household's timezone. `VOICE_FFMPEG_BIN` defaults to `ffmpeg` on `PATH`. For mobile recording, serve the app at a trusted HTTPS address and use that same address as `ORIGIN`. Desktop `localhost` also supports recording.
+
+Try “今天中午十二点吃了十五克” after noon, or “刚才排便一次”. Entries with unclear dates, amounts, or activity go to **Needs review**. Review recordings from any browser signed in to the same account. The page keeps the audio available until you save or discard the draft. Meal amounts are available as `amountGrams` in `GET /api/logs`.
 
 ## User management
 

@@ -9,6 +9,7 @@
 	import { renderMarkdown } from '#lib/markdown.js';
 	import { activityDisplayIcon, activityDisplayLabel } from '#lib/i18n/labels.js';
 	import { t, getLocale } from '#lib/i18n/index.js';
+	import { formatMealGrams, voiceCopy } from '#lib/i18n/voice.js';
 	import type { UserRef } from '#lib/types.js';
 	import type { Species } from '#lib/activityTypes.js';
 
@@ -19,6 +20,7 @@
 		subtypes: string[] | null;
 		notes: string | null;
 		durationMinutes: number | null;
+		amountGrams?: number | null;
 		loggedAt: Date | string;
 		logger: UserRef;
 	}
@@ -163,6 +165,14 @@
 					<NotebookPen class="h-3.5 w-3.5 mr-1.5" />
 					{t(locale, 'page.dashboard.modalOpenJournal')}
 				</Button>
+			</div>
+		{/if}
+		{#if event.amountGrams != null}
+			<div class="flex items-center gap-3">
+				<span class="w-20 shrink-0 text-xs font-medium text-muted-foreground"
+					>{voiceCopy(locale).amount}</span
+				>
+				<span>{formatMealGrams(locale, event.amountGrams)}</span>
 			</div>
 		{/if}
 	</div>

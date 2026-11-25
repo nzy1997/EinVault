@@ -8,6 +8,7 @@
 	import EmptyState from '#lib/components/EmptyState.svelte';
 	import ActivityDetailModal from '#lib/components/log/ActivityDetailModal.svelte';
 	import { t, getLocale } from '#lib/i18n/index.js';
+	import { formatMealGrams } from '#lib/i18n/voice.js';
 	import { activityDisplayIcon, activityDisplayLabel } from '#lib/i18n/labels.js';
 	import { stripMarkdown } from '#lib/markdown.js';
 	import type { Species } from '#lib/activityTypes.js';
@@ -18,6 +19,7 @@
 		subtypes: string[] | null;
 		notes: string | null;
 		durationMinutes: number | null;
+		amountGrams?: number | null;
 		loggedAt: Date;
 		loggedBy: string | null;
 		logger: { displayName: string } | null;
@@ -90,6 +92,11 @@
 							>
 							{#if event.durationMinutes}
 								<span class="text-xs text-muted-foreground">{event.durationMinutes} min</span>
+							{/if}
+							{#if event.amountGrams != null}
+								<span class="text-xs text-muted-foreground"
+									>{formatMealGrams(locale, event.amountGrams)}</span
+								>
 							{/if}
 						</div>
 						{#if event.notes}

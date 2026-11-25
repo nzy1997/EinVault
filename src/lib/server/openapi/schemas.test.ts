@@ -48,6 +48,7 @@ describe('response schemas match their serializers', () => {
 			type: 'walk' as const,
 			notes: 'a note',
 			durationMinutes: 15,
+			amountGrams: null,
 			subtypes: null,
 			loggedAt: new Date(),
 			createdAt: new Date(),

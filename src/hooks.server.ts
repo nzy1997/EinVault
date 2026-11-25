@@ -99,7 +99,16 @@ const securityHeaders: Handle = async ({ event, resolve }) => {
 	response.headers.set('X-Frame-Options', 'DENY');
 	response.headers.set('X-Content-Type-Options', 'nosniff');
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-	response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+	const voicePage =
+		event.route.id === '/(app)/voice' &&
+		response.ok &&
+		!DEMO_MODE &&
+		event.locals.user &&
+		event.locals.user.role !== 'caretaker';
+	response.headers.set(
+		'Permissions-Policy',
+		`camera=(), microphone=(${voicePage ? 'self' : ''}), geolocation=()`
+	);
 
 	// CSP is normally emitted by SvelteKit (see the `csp` option in vite.config.ts) so
 	// the per-render nonce flows through `%sveltekit.nonce%`. If a `+server.ts`

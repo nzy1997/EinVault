@@ -1,6 +1,7 @@
 import { sql, relations } from 'drizzle-orm';
 import {
 	integer,
+	blob,
 	sqliteTable,
 	text,
 	uniqueIndex,
@@ -12,6 +13,7 @@ import {
 } from 'drizzle-orm/sqlite-core';
 // Relative, not #lib: this file is loaded outside Vite (drizzle-kit, Playwright seed).
 import { DAILY_EVENT_TYPES, WEIGHT_UNITS, SPECIES, DOCUMENT_CATEGORIES } from '../../activityTypes';
+import type { VoiceAudioType, VoiceDraft } from '../../voice';
 
 // users
 
@@ -541,6 +543,7 @@ export const dailyEvents = sqliteTable(
 		}).notNull(),
 		notes: text('notes'),
 		durationMinutes: integer('duration_minutes'),
+		amountGrams: real('amount_grams'),
 		subtypes: text('subtypes', { mode: 'json' }).$type<string[]>(),
 		loggedAt: integer('logged_at', { mode: 'timestamp' }).notNull(),
 		createdAt: integer('created_at', { mode: 'timestamp' })
@@ -554,6 +557,27 @@ export const dailyEvents = sqliteTable(
 		loggedIdx: index('daily_logged_idx').on(t.loggedAt),
 		groupIdx: index('daily_event_group_idx').on(t.eventGroupId)
 	})
+);
+
+export const voiceCaptures = sqliteTable(
+	'voice_captures',
+	{
+		id: text('id').primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		companionId: text('companion_id')
+			.notNull()
+			.references(() => companions.id, { onDelete: 'cascade' }),
+		createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+		status: text('status', { enum: ['pending', 'saved', 'discarded'] }).notNull(),
+		mimeType: text('mime_type').$type<VoiceAudioType>().notNull(),
+		audio: blob('audio', { mode: 'buffer' }),
+		transcript: text('transcript'),
+		draft: text('draft', { mode: 'json' }).$type<VoiceDraft>(),
+		eventId: text('event_id').references(() => dailyEvents.id, { onDelete: 'set null' })
+	},
+	(t) => [index('voice_captures_queue_idx').on(t.userId, t.status, t.createdAt)]
 );
 
 // reminders

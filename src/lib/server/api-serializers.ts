@@ -50,6 +50,7 @@ export function toApiDailyEvent(row: DailyEventRow) {
 		type: row.type,
 		notes: row.notes,
 		durationMinutes: row.durationMinutes,
+		amountGrams: row.amountGrams,
 		subtypes: row.subtypes,
 		loggedAt: row.loggedAt,
 		eventGroupId: row.eventGroupId

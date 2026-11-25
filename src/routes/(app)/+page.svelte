@@ -7,7 +7,19 @@
 	import Age from '#lib/components/Age.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Badge } from '#lib/components/ui/badge/index.js';
-	import { Plus, Zap, Check, Pencil, Bell, X, House, Activity, ChevronDown } from '@lucide/svelte';
+	import {
+		Plus,
+		Zap,
+		Check,
+		Pencil,
+		Bell,
+		X,
+		House,
+		Activity,
+		ChevronDown,
+		Mic
+	} from '@lucide/svelte';
+	import { voiceCopy } from '#lib/i18n/voice.js';
 	import DailyLogForm from '#lib/components/log/DailyLogForm.svelte';
 	import QuickLogButtons from '#lib/components/log/QuickLogButtons.svelte';
 	import PageHeader from '#lib/components/PageHeader.svelte';
@@ -385,6 +397,18 @@
 	>
 		{#snippet icon()}<House class="h-5 w-5" />{/snippet}
 		{#snippet actions()}
+			{#if data.companions.some((companion) => companion.species === 'cat')}
+				<Button
+					href="/voice"
+					data-sveltekit-reload
+					variant="outline"
+					size="sm"
+					class="shrink-0 gap-1.5"
+				>
+					<Mic class="size-4" />
+					{voiceCopy(locale).title}
+				</Button>
+			{/if}
 			{#if data.companions.length > 0}
 				<Button href="/companions/new" size="sm" class="shrink-0 gap-1.5">
 					<Plus class="h-4 w-4" />

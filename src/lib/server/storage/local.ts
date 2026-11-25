@@ -19,7 +19,7 @@ function resolveKey(key: string): string {
 // Parse a single-range `bytes=start-end` header against a known size. Returns
 // inclusive start/end offsets, or null for absent/multi/malformed/unsatisfiable
 // ranges (caller then serves the full object).
-function parseRange(
+export function parseRange(
 	header: string | null | undefined,
 	size: number
 ): { start: number; end: number } | null {

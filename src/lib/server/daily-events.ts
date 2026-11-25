@@ -13,6 +13,7 @@ export interface DailyEventInput {
 	durationMinutes: number | null;
 	loggedAt: Date;
 	subtypes?: string[] | null;
+	amountGrams?: number | null;
 }
 
 // Species rule shared by every daily-event write path: a target that can't
@@ -55,15 +56,16 @@ export async function checkSpeciesAndNarrow(
 	return { ok: true, subtypesById };
 }
 
-// Insert one daily_events row per authorized companion; rows from a single
-// submission share an eventGroupId so multi-companion logs stay linked.
-export async function logDailyEvent(
+// Build rows after authorization and validation so callers can insert them
+// together with other related changes in a single transaction.
+export async function prepareDailyEvents(
 	user: { id: string; role: UserRole },
 	companionIds: string[],
 	input: DailyEventInput,
 	opts: { rejectUnusableSubtypes?: boolean } = {}
 ): Promise<
-	{ ok: true; ids: string[]; eventGroupId: string | null } | { ok: false; code: CareErrorCode }
+	| { ok: true; rows: (typeof schema.dailyEvents.$inferInsert)[]; eventGroupId: string | null }
+	| { ok: false; code: CareErrorCode }
 > {
 	const resolved = await authorizeCompanions(user, companionIds);
 	if (!resolved.ok) return resolved;
@@ -79,13 +81,30 @@ export async function logDailyEvent(
 		type: input.type,
 		notes: input.notes,
 		durationMinutes,
+		amountGrams: input.type === 'meal' ? (input.amountGrams ?? null) : null,
 		subtypes: checked.subtypesById.get(cid) ?? null,
 		loggedAt: input.loggedAt,
 		loggedBy: user.id,
 		eventGroupId
 	}));
 
-	await db.insert(schema.dailyEvents).values(rows);
+	return { ok: true, rows, eventGroupId };
+}
 
-	return { ok: true, ids: rows.map((r) => r.id), eventGroupId };
+export async function logDailyEvent(
+	user: { id: string; role: UserRole },
+	companionIds: string[],
+	input: DailyEventInput,
+	opts: { rejectUnusableSubtypes?: boolean } = {}
+): Promise<
+	{ ok: true; ids: string[]; eventGroupId: string | null } | { ok: false; code: CareErrorCode }
+> {
+	const prepared = await prepareDailyEvents(user, companionIds, input, opts);
+	if (!prepared.ok) return prepared;
+	await db.insert(schema.dailyEvents).values(prepared.rows);
+	return {
+		ok: true,
+		ids: prepared.rows.map((row) => row.id!),
+		eventGroupId: prepared.eventGroupId
+	};
 }

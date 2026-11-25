@@ -24,9 +24,11 @@
 		Activity,
 		Pill,
 		Package,
+		Mic,
 		Plus
 	} from '@lucide/svelte';
 	import EmptyState from '#lib/components/EmptyState.svelte';
+	import { voiceCopy } from '#lib/i18n/voice.js';
 	import { enhance } from '$app/forms';
 	import { tick } from 'svelte';
 	import { renderMarkdown, stripMarkdown } from '#lib/markdown.js';
@@ -939,6 +941,16 @@
 				/>
 			</div>
 			<div class="flex flex-wrap gap-2">
+				{#if species === 'cat'}
+					<a
+						href="/voice?companion={companion.id}"
+						data-sveltekit-reload
+						class="flex-1 flex flex-col items-center gap-1 rounded-xl border border-primary/30 bg-primary/5 p-3 text-center text-xs font-medium text-primary hover:bg-primary/10"
+					>
+						<Mic class="size-5" />
+						<span>{voiceCopy(locale).title}</span>
+					</a>
+				{/if}
 				{#each quickLogTypes as opt (opt.value)}
 					<a
 						href="/{companion.id}/log?type={opt.value}"

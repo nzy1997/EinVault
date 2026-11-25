@@ -67,5 +67,8 @@ export const variables = defineEnvVars({
 	VIDEO_TRANSCODE_MAX_HEIGHT: optional,
 	VIDEO_TRANSCODE_MAX_MB: optional,
 	VIDEO_TRANSCODE_MAX_SECONDS: optional,
-	VIDEO_TRANSCODE_MAX_WIDTH: optional
+	VIDEO_TRANSCODE_MAX_WIDTH: optional,
+	VOICE_FFMPEG_BIN: optional,
+	VOICE_WHISPER_BIN: optional,
+	VOICE_WHISPER_MODEL: optional
 });

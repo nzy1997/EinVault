@@ -104,6 +104,11 @@ export const LoggedEvent = z
 		type: DailyEventType,
 		notes: z.string().nullable(),
 		durationMinutes: z.number().int().nullable(),
+		amountGrams: z
+			.number()
+			.positive()
+			.nullable()
+			.openapi({ description: 'Amount eaten, in grams, when recorded for a meal.' }),
 		subtypes: z.array(z.string()).nullable(),
 		loggedAt: z.string().openapi({ description: 'ISO 8601 timestamp.' }),
 		eventGroupId: z.string().nullable()
