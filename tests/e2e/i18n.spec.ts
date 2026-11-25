@@ -89,22 +89,27 @@ test.describe('i18n', () => {
 		await ctx.close();
 	});
 
-	test('Accept-Language header falls back to matching locale', async ({ app, browser }) => {
-		// Playwright's locale option sets the browser Accept-Language header.
-		// extraHTTPHeaders cannot override browser-generated headers in Chromium.
-		const ctx = await browser.newContext({
-			baseURL: app.server.baseURL,
-			locale: 'fr-FR'
+	for (const { browserLocale, expectedLocale, signIn } of [
+		{ browserLocale: 'fr-FR', expectedLocale: 'fr', signIn: 'Se connecter' },
+		{ browserLocale: 'zh-CN', expectedLocale: 'zh-CN', signIn: '登录' },
+		{ browserLocale: 'zh-Hans', expectedLocale: 'zh-CN', signIn: '登录' }
+	]) {
+		test(`Accept-Language selects the matching locale for ${browserLocale}`, async ({
+			app,
+			browser
+		}) => {
+			// Playwright's locale option sets the browser Accept-Language header.
+			const ctx = await browser.newContext({ baseURL: app.server.baseURL, locale: browserLocale });
+			try {
+				const page = await ctx.newPage();
+				await page.goto('/auth/login');
+				await expect(page.getByRole('button', { name: signIn, exact: true })).toBeVisible();
+				await expect(page.locator('html')).toHaveAttribute('lang', expectedLocale);
+			} finally {
+				await ctx.close();
+			}
 		});
-		const page = await ctx.newPage();
-		await page.goto('/auth/login');
-
-		// 'Se connecter' is page.login.signIn in fr.ts (the submit button)
-		await expect(page.getByRole('button', { name: 'Se connecter' })).toBeVisible();
-		await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
-
-		await ctx.close();
-	});
+	}
 
 	test('pet dashboards and the household page fit a 360px screen in every locale', async ({
 		asMember,
@@ -131,7 +136,7 @@ test.describe('i18n', () => {
 
 		await asMember.setViewportSize({ width: 360, height: 800 });
 		try {
-			for (const locale of ['en', 'de', 'es', 'fr', 'it', 'pt']) {
+			for (const locale of ['en', 'de', 'es', 'fr', 'it', 'pt', 'zh-CN']) {
 				setLocale(locale);
 				for (const href of ['/seed-comp-ein', '/seed-comp-julia', '/']) {
 					await asMember.goto(href);

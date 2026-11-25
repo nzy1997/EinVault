@@ -11,19 +11,20 @@ import { isSecureRequest } from '#lib/server/auth/index.js';
 import { generateId } from '#lib/server/utils.js';
 import bcrypt from 'bcryptjs';
 import { count } from 'drizzle-orm';
-import { t, DEFAULT_LOCALE } from '#lib/i18n/index.js';
+import { t } from '#lib/i18n/index.js';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
 	try {
 		await db.$count(schema.users);
 	} catch {
-		error(503, t(DEFAULT_LOCALE, 'error.databaseNotReady'));
+		error(503, t(locals.locale, 'error.databaseNotReady'));
 	}
 	return {};
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, locals }) => {
+		const { locale } = locals;
 		const data = await request.formData();
 		const displayName = String(data.get('displayName') ?? '').trim();
 		const username = String(data.get('username') ?? '')
@@ -33,21 +34,21 @@ export const actions: Actions = {
 		const confirmPassword = String(data.get('confirmPassword') ?? '');
 
 		if (!displayName || !username || !password || !confirmPassword) {
-			return fail(400, { error: t(DEFAULT_LOCALE, 'error.allFieldsRequired') });
+			return fail(400, { error: t(locale, 'error.allFieldsRequired') });
 		}
 		if (!/^[a-z0-9_-]+$/.test(username)) {
 			return fail(400, {
-				error: t(DEFAULT_LOCALE, 'error.invalidUsernameFormat')
+				error: t(locale, 'error.invalidUsernameFormat')
 			});
 		}
 		if (password.length < 8) {
-			return fail(400, { error: t(DEFAULT_LOCALE, 'error.passwordTooShort') });
+			return fail(400, { error: t(locale, 'error.passwordTooShort') });
 		}
 		if (password.length > 128) {
-			return fail(400, { error: t(DEFAULT_LOCALE, 'error.passwordTooLong') });
+			return fail(400, { error: t(locale, 'error.passwordTooLong') });
 		}
 		if (password !== confirmPassword) {
-			return fail(400, { error: t(DEFAULT_LOCALE, 'error.passwordsMismatch') });
+			return fail(400, { error: t(locale, 'error.passwordsMismatch') });
 		}
 
 		const passwordHash = await bcrypt.hash(password, 12);
@@ -63,14 +64,15 @@ export const actions: Actions = {
 					username,
 					displayName,
 					passwordHash,
-					role: 'admin'
+					role: 'admin',
+					locale
 				})
 				.run();
 			return true;
 		});
 
 		if (!inserted) {
-			return fail(403, { error: t(DEFAULT_LOCALE, 'error.setupAlreadyCompleted') });
+			return fail(403, { error: t(locale, 'error.setupAlreadyCompleted') });
 		}
 
 		const token = generateSessionToken();
