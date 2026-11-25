@@ -62,6 +62,8 @@
 			typeof navigator.mediaDevices?.getUserMedia === 'function' &&
 			typeof MediaRecorder !== 'undefined'
 		);
+		selectedFile = fileInput?.files?.item(0) ?? null;
+		if (selectedFile) startNewCapture();
 		return () => {
 			disposed = true;
 			if (recorder?.state === 'recording') recorder.stop();
@@ -225,7 +227,7 @@
 					name="audio"
 					type="file"
 					accept={VOICE_AUDIO_TYPES.join(',')}
-					disabled={recording || submitting}
+					disabled={canRecord === null || recording || submitting}
 					onchange={(event) => {
 						clearRecording();
 						selectedFile = event.currentTarget.files?.[0] ?? null;
